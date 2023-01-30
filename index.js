@@ -30,10 +30,13 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
   Aşağıdaki skor1 ve skor2 kodlarını inceleyiniz ve aşağıdaki soruları altına not alarak cevaplayın
   
   1. skor1 ve skor2 arasındaki fark nedir?
+  skor1 globalde tanımlanmış ve closure yapısındadır, Fonksiyon içinde başka bir fonksiyon çağrılmaktadır.
   
   2. Hangisi bir closure kullanmaktadır? Nasıl tarif edebilirsin? (yarınki derste öğreneceksin :) )
+  skor1 closure kullanmaktadır.
   
   3. Hangi durumda skor1 tercih edilebilir? Hangi durumda skor2 daha mantıklıdır?
+
 */
 
 // skor1 kodları
@@ -64,11 +67,16 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru(){
+    /*let skor=Math.random();    //0<=skor<1
+    let genisSkor=skor*16;     //0<=genisSkor<16
+    let tamSayiSkor = Math.floor(genisSkor);   //tamSayiSkor= 0,1...15
+    let macSkoru = tamSayiSkor+10;       //macSkoru = 10,11...25 */
+
+    let macSkoru2= Math.round((Math.random()*16)+10);
+    return macSkoru2;
 }
-
-
+console.log(takimSkoru());
 
 
 /* Görev 3: macSonucu() 
@@ -86,12 +94,22 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(callback, ceyrekSayisi){
+  let evSahibiSkoru=0;
+  let konukTakimSkoru=0;
+  for(let i=1; i<=ceyrekSayisi;i++){
+    evSahibiSkoru=evSahibiSkoru+callback();
+    konukTakimSkoru+=callback();
+  }
+  while(evSahibiSkoru==konukTakimSkoru){
+    evSahibiSkoru+=callback();
+    konukTakimSkoru+=callback();
+  }
+  return {"EvSahibi": evSahibiSkoru,
+  "KonukTakim": konukTakimSkoru};
 }
 
-
-
+console.log(macSonucu(takimSkoru,4))
 
 
 
@@ -109,10 +127,12 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-
+function periyotSkoru(callBackTakimSkoru) {
+  let skor = {"EvSahibi": callBackTakimSkoru(),
+  "KonukTakim": callBackTakimSkoru()};
+  return skor;
 }
+console.log(periyotSkoru(takimSkoru));
 
 
 /* Zorlayıcı Görev 5: skorTabelasi() 
@@ -146,9 +166,29 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(cb_periyotSkoru, cb_takimSkoru, ceyrekSayisi) {
+  let macDetaylari=[];
+  let macEvSahibi=0;
+  let macKonukTakim=0;
+  for(let i=1; i<=ceyrekSayisi; i++){
+    let periyotSkoru = cb_periyotSkoru(cb_takimSkoru);
+    macEvSahibi+=periyotSkoru.EvSahibi;
+    macKonukTakim+=periyotSkoru.KonukTakim;
+    macDetaylari.push(`${i}. Periyot: Ev Sahibi ${periyotSkoru.EvSahibi} - Konuk Takım ${periyotSkoru.KonukTakim}`);
+  }
+  
+  let i=1;
+  while(macEvSahibi==macKonukTakim){
+    let periyotSkoru = cb_periyotSkoru(cb_takimSkoru);
+    macEvSahibi+=periyotSkoru.EvSahibi;
+    macKonukTakim+=periyotSkoru.KonukTakim;
+    macDetaylari.push(`${i}. Uzatma: Ev Sahibi ${periyotSkoru.EvSahibi} - Konuk Takım ${periyotSkoru.KonukTakim}`);
+    i++;
+  }
+  macDetaylari.push(`Maç Sonucu: Ev Sahibi ${macEvSahibi} - Konuk Takım ${macKonukTakim}`);
+  return macDetaylari;
 }
+console.log(skorTabelasi(periyotSkoru, takimSkoru, 4));
 
 
 
